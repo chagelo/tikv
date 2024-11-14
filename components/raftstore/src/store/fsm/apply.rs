@@ -4068,10 +4068,8 @@ where
 
         let mut entries = Vec::new();
 
-        let mut dangle_size = 0;
         for cached_entries in apply.entries {
-            let (e, sz) = cached_entries.take_entries();
-            dangle_size += sz;
+            let (e, _) = cached_entries.take_entries();
             if e.is_empty() {
                 let rid = self.delegate.region_id();
                 let StdRange { start, end } = cached_entries.range;
@@ -4084,10 +4082,6 @@ where
             } else {
                 entries.extend(e);
             }
-        }
-        if dangle_size > 0 {
-            MEMTRACE_ENTRY_CACHE.trace(TraceEvent::Sub(dangle_size));
-            RAFT_ENTRIES_CACHES_GAUGE.sub(dangle_size as i64);
         }
 
         self.delegate.term = apply.term;
